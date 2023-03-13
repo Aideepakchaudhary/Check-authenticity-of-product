@@ -1,7 +1,7 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 
-// Only manufacturing unit will all the hash of the product..
+// Only manufacturing unit will allow to add all the hash of the product..
 // Check if hash is found in the storage that means the product is authentic.
 // Should have mechanism to add manufacturing unit
 // Need to think..if a product is used then do we need to delete the product from the chain?
@@ -20,13 +20,15 @@ pub use pallet::*;
 #[frame_support::pallet]
 pub mod pallet {
 	use frame_support::inherent::Vec;
+	use frame_support::log;
+	use frame_support::log::log;
 	use frame_support::pallet_prelude::*;
 	use frame_system::pallet_prelude::*;
 
 	#[pallet::config]
 	pub trait Config: frame_system::Config {
 		/// Because this pallet emits events, it depends on the runtime's definition of an event.
-		type Event: From<Event<Self>> + IsType<<Self as frame_system::Config>::Event>;
+		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 	}
 
 	#[pallet::pallet]
@@ -55,7 +57,7 @@ pub mod pallet {
 
 		// Add hash of the product..
 		#[pallet::weight(10_000)]
-		pub fn add_product(origin: OriginFor<T>, hash: T::AccountId) -> DispatchResult {
+		pub fn add_product(origin: OriginFor<T>, hash: T::Hash) -> DispatchResult {
 			Ok(())
 		}
 	}
