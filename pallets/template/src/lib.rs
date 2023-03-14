@@ -51,6 +51,7 @@ pub mod pallet {
 	pub enum Event<T: Config> {
 		ProductAdded,
 		ManufacturerAdded,
+		AuthenticProduct,
 	}
 
 	// Error inform users that something went wrong.
@@ -62,6 +63,8 @@ pub mod pallet {
 		ProductAlreadyPresent,
 		// If a manufacturer is already present
 		ManufacturerAlreadyPresent,
+		// If product is not present (i.e Unauthentic product)
+		UnAuthenticProduct,
 	}
 
 	#[pallet::call]
@@ -76,12 +79,12 @@ pub mod pallet {
 			let all_manufacturer = Manufacturer::<T>::get();
 			let _location = all_manufacturer.binary_search(&who).ok().ok_or(Error::<T>::UnAuthorisedPerson)?;
 
-			let mut all_hash = ProductsHash::<T>::get();
-			let location = all_hash.binary_search(&hash).err().ok_or(Error::<T>::ProductAlreadyPresent)?;
+			let mut all_products = ProductsHash::<T>::get();
+			let location = all_products.binary_search(&hash).err().ok_or(Error::<T>::ProductAlreadyPresent)?;
 
-			all_hash.insert(location, hash);
+			all_products.insert(location, hash);
 
-			ProductsHash::<T>::put(all_hash);
+			ProductsHash::<T>::put(all_products);
 
 			Self::deposit_event(Event::ProductAdded);
 			Ok(())
@@ -102,7 +105,13 @@ pub mod pallet {
 		}
 
 		#[pallet::weight(10_100)]
-		pub fn check_authenticity(origin: OriginFor<T>, who: T::Hash) -> DispatchResult {
+		pub fn check_authenticity(origin: OriginFor<T>, hash: T::Hash) -> DispatchResult {
+			let who = ensure_signed(origin)?;
+
+			let mut all_products = ProductsHash::<T>::get();
+			let location = all_products.binary_search(&hash).ok().ok_or(Error::<T>::UnAuthenticProduct)?;
+
+			Self::deposit_event(Event::<T>::AuthenticProduct);
 
 			Ok(())
 		}
