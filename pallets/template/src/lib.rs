@@ -11,7 +11,6 @@
 
 
 pub use pallet::*;
-use pallet_timestamp::{self as timestamp};
 // #[cfg(test)]
 // mod mock;
 
@@ -22,8 +21,6 @@ use pallet_timestamp::{self as timestamp};
 #[frame_support::pallet]
 pub mod pallet {
 	use frame_support::inherent::Vec;
-	use frame_support::log;
-	use frame_support::log::log;
 	use frame_support::pallet_prelude::*;
 	use frame_system::pallet_prelude::*;
 
@@ -106,25 +103,15 @@ pub mod pallet {
 
 		#[pallet::weight(10_100)]
 		pub fn check_authenticity(origin: OriginFor<T>, hash: T::Hash) -> DispatchResult {
-			let who = ensure_signed(origin)?;
+			ensure_signed(origin)?;
 
-			let mut all_products = ProductsHash::<T>::get();
-			let location = all_products.binary_search(&hash).ok().ok_or(Error::<T>::UnAuthenticProduct)?;
+			let all_products = ProductsHash::<T>::get();
+			all_products.binary_search(&hash).ok().ok_or(Error::<T>::UnAuthenticProduct)?;
 
 			Self::deposit_event(Event::<T>::AuthenticProduct);
 
 			Ok(())
 		}
-
-		// #[pallet::weight(10_000)]
-		// pub fn get_time(origin: OriginFor<T>) -> DispatchResult {
-		// 	ensure_signed(origin)?;
-		//
-		// 	// let now = <Timestamp::Pallet<T>>::get();
-		// 	let now = pallet_timestamp::Pallet::<T>::get();
-		// 	log::info!("Timestamp of current block {:?}", now);
-		// 	Ok(())
-		// }
 	}
 }
 
