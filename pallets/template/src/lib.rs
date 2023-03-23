@@ -9,6 +9,10 @@
 // how to generate a unique hash?
 // What are the details required to add the manufacturer?
 
+//! We Need to store the products in a different storage(partially_selled_products) which is scanned first..so that no one can copy the product QR.
+//! If a user wants to return the Product and we have 15 days for it.until then this product is stored in partially_selled_products.
+//! After the return time is over the product goes to sell_product.
+//! If product is returned under the given time slot.
 
 pub use pallet::*;
 // #[cfg(test)]
