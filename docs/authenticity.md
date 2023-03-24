@@ -11,3 +11,12 @@ How to generate a unique hash?
 What are the details required to add the manufacturer?
 How to prevent qr copy?
 ```
+
+### Corner cases
+
+```
+1. We Need to store the products in a different storage(partially_selled_products) which is scanned first..so that no one can copy the product QR.
+2. If a user wants to return the Product and we have 15 days for it.until then this product is stored in partially_selled_products.
+3. After the return time is over the product goes to sell_product.
+4. If product is returned under the given time slot.
+```
