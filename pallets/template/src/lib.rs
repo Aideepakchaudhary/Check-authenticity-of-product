@@ -36,6 +36,14 @@ pub mod pallet {
 	#[pallet::getter(fn manufacturers)]
 	pub type Manufacturer<T: Config> = StorageValue<_, Vec<T::AccountId>, ValueQuery>;
 
+	#[pallet::storage]
+	#[pallet::getter(fn partialsellproduct)]
+	pub type PartialSellProduct<T: Config> = StorageValue<_, Vec<T::Hash>, ValueQuery>;
+
+	#[pallet::storage]
+	#[pallet::getter(fn selledproducts)]
+	pub type SellProducts<T: Config> = StorageValue<_, Vec<T::Hash>, ValueQuery>;
+
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
@@ -98,13 +106,26 @@ pub mod pallet {
 		pub fn check_authenticity(origin: OriginFor<T>, hash: T::Hash) -> DispatchResult {
 			ensure_signed(origin)?;
 
-			let all_products = ProductsHash::<T>::get();
-			all_products.binary_search(&hash).ok().ok_or(Error::<T>::UnAuthenticProduct)?;
+			// Check the product in fresh added products.
+			let mut all_products = ProductsHash::<T>::get();
+			let location = all_products.binary_search(&hash).ok().ok_or(Error::<T>::UnAuthenticProduct)?;
+
+
+			// Now the product is sell for first time.
+			// Add in the partial sell product..because it might me return in future.
+			let mut partial_sell = PartialSellProduct::<T>::get();
+			partial_sell.push(hash);
+			PartialSellProduct::<T>::put(partial_sell);
+
+			// Remove this item from freshly added products.
+			all_products.remove(location);
+			ProductsHash::<T>::put(all_products);
 
 			Self::deposit_event(Event::<T>::AuthenticProduct);
 
 			Ok(())
 		}
+
 	}
 }
 
