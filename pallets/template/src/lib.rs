@@ -137,12 +137,14 @@ pub mod pallet {
 			ensure_signed(who.clone())?;
 
 			let mut products = PartialSellProduct::<T>::get();
-
+			// check this product is sold or not?
 			let location = products.binary_search(&hash).err().ok_or(Error::<T>::UnsoldProduct)?;
 
+			// Now remove the product from partial sale.
 			products.remove(location);
 			PartialSellProduct::<T>::put(products);
 
+			// Add the product into returned product storage for originality check in manufacturing unit and then again this product is available for sale.
 			let mut items = ReturnedProducts::<T>::get();
 			items.push(hash);
 			ReturnedProducts::<T>::put(items);
