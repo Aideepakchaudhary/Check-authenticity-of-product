@@ -44,6 +44,10 @@ pub mod pallet {
 	#[pallet::getter(fn selledproducts)]
 	pub type SellProducts<T: Config> = StorageValue<_, Vec<T::Hash>, ValueQuery>;
 
+	#[pallet::storage]
+	#[pallet::getter(fn retunedproducts)]
+	pub type ReturnedProducts<T: Config> = StorageValue<_,Vec<T::Hash>, ValueQuery>;
+
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
@@ -63,6 +67,8 @@ pub mod pallet {
 		ManufacturerAlreadyPresent,
 		// If product is not present (i.e Unauthentic product)
 		UnAuthenticProduct,
+		// If product was not sold.
+		UnsoldProduct,
 	}
 
 	#[pallet::call]
@@ -102,7 +108,7 @@ pub mod pallet {
 			Ok(())
 		}
 
-		#[pallet::weight(10_100)]
+		#[pallet::weight(10_000)]
 		pub fn check_authenticity(origin: OriginFor<T>, hash: T::Hash) -> DispatchResult {
 			ensure_signed(origin)?;
 
@@ -125,6 +131,26 @@ pub mod pallet {
 
 			Ok(())
 		}
+
+		#[pallet::weight(10_000)]
+		pub fn refund_products(who: OriginFor<T>, hash: T::Hash) -> DispatchResult {
+			ensure_signed(who.clone())?;
+
+			let mut products = PartialSellProduct::<T>::get();
+
+			let location = products.binary_search(&hash).err().ok_or(Error::<T>::UnsoldProduct)?;
+
+			products.remove(location);
+			PartialSellProduct::<T>::put(products);
+
+			let mut items = ReturnedProducts::<T>::get();
+			items.push(hash);
+			ReturnedProducts::<T>::put(items);
+
+			Ok(())
+		}
+
+
 
 	}
 }
