@@ -1,4 +1,4 @@
-# Check Authenticity of a Product
+# Idea formation
 Only manufacturing unit will allow to add all the hash of the product.
 
  Check if hash is found in the storage that means the product is authentic.

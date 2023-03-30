@@ -71,6 +71,9 @@ pub mod pallet {
 		UnsoldProduct,
 	}
 
+	// Hooks
+	// after 15 days product from pending selling should converted to selled.
+
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
 
