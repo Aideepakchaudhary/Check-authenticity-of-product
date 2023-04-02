@@ -11,6 +11,7 @@ pub use pallet::*;
 #[frame_support::pallet]
 pub mod pallet {
 	use frame_support::inherent::Vec;
+	use frame_support::pallet;
 	use frame_support::pallet_prelude::*;
 	use frame_system::pallet_prelude::*;
 
@@ -45,6 +46,10 @@ pub mod pallet {
 	#[pallet::getter(fn retunedproducts)]
 	pub type ReturnedProducts<T: Config> = StorageValue<_,Vec<T::Hash>, ValueQuery>;
 
+	#[pallet::storage]
+	#[pallet::getter(fn partialproducttime)]
+	pub type PartialProductTime<T: Config> = StorageMap<_, Blake2_128Concat, BlockNumberFor<T>, T::Hash, ValueQuery>;
+
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
 	pub enum Event<T: Config> {
@@ -70,6 +75,14 @@ pub mod pallet {
 
 	// Hooks
 	// after 15 days product from pending selling should converted to selled.
+
+	#[pallet::hooks]
+	impl<T:Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
+		fn on_initialize(n: BlockNumberFor<T>) -> Weight {
+			// Need to work..
+			Weight::zero()
+		}
+	}
 
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
@@ -122,6 +135,13 @@ pub mod pallet {
 			let mut partial_sell = PartialSellProduct::<T>::get();
 			partial_sell.push(hash);
 			PartialSellProduct::<T>::put(partial_sell);
+
+			// After 15 days the users are not able to return the product.
+			let expire_time: u32 = 2_16_000;  // (60/6) * 60 * 24 * 15
+			// Record the product with the current BlockNumber
+			let refund_invalid = frame_system::Pallet::<T>::block_number() + expire_time.into();
+
+			PartialProductTime::<T>::insert(refund_invalid, &hash);
 
 			// Remove this item from freshly added products.
 			all_products.remove(location);
