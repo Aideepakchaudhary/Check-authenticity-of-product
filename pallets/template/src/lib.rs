@@ -19,6 +19,9 @@ pub mod pallet {
 	pub trait Config: frame_system::Config{
 		/// Because this pallet emits events, it depends on the runtime's definition of an event.
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
+
+		/// TimeDuration to return products
+		type expire_time : Get<u32>;
 	}
 
 	#[pallet::pallet]
@@ -137,7 +140,7 @@ pub mod pallet {
 			PartialSellProduct::<T>::put(partial_sell);
 
 			// After 15 days the users are not able to return the product.
-			let expire_time: u32 = 2_16_000;  // (60/6) * 60 * 24 * 15
+			let expire_time = T::expire_time::get();  // (60/6) * 60 * 24 * 15
 			// Record the product with the current BlockNumber
 			let refund_invalid = frame_system::Pallet::<T>::block_number() + expire_time.into();
 

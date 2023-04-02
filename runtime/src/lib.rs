@@ -278,9 +278,14 @@ impl pallet_sudo::Config for Runtime {
 	type RuntimeCall = RuntimeCall;
 }
 
+parameter_types! {
+	pub const TimeDuration: u32 = 2_16_000;
+}
+
 /// Configure the pallet-template in pallets/template.
 impl pallet_template::Config for Runtime {
 	type RuntimeEvent = RuntimeEvent;
+	type expire_time = TimeDuration;
 }
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
