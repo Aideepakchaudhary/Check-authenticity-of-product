@@ -40,7 +40,6 @@ pub use frame_support::{
 	StorageValue,
 };
 use frame_support::log;
-use frame_support::log::log;
 pub use frame_system::Call as SystemCall;
 pub use pallet_balances::Call as BalancesCall;
 pub use pallet_timestamp::Call as TimestampCall;

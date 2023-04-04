@@ -82,7 +82,16 @@ pub mod pallet {
 	#[pallet::hooks]
 	impl<T:Config> Hooks<BlockNumberFor<T>> for Pallet<T> {
 		fn on_initialize(n: BlockNumberFor<T>) -> Weight {
-			// Need to work..
+			let is_expire = PartialProductTime::<T>::contains_key(n);
+
+			if is_expire {
+				let expire_product = PartialProductTime::<T>::get(n);
+				// Remove the product from the partial product
+				let mut all_product = PartialSellProduct::<T>::get();
+				let location: usize = all_product.binary_search(&expire_product).unwrap();
+
+				all_product.remove(location);
+			}
 			Weight::zero()
 		}
 	}
