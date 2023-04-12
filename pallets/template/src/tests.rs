@@ -13,3 +13,18 @@ fn add_manufacture_successfully() {
 		assert_ok!(TemplateModule::add_manufacturer(RuntimeOrigin::root(), TEST_ACCOUNT));
 	})
 }
+
+#[test]
+fn add_duplicate_manufacture_fail() {
+	new_test_ext().execute_with(|| {
+		const TEST_ACCOUNT: <Test as frame_support::Config>::AccountId = 1;
+		// Dispatch a signed extrinsic.
+
+		assert_ok!(TemplateModule::add_manufacturer(RuntimeOrigin::root(), TEST_ACCOUNT));
+		assert_noop!(
+			TemplateModule::add_manufacturer(RuntimeOrigin::root(), TEST_ACCOUNT),
+			Error::<Test>::ManufacturerAlreadyPresent
+		);
+
+	})
+}
