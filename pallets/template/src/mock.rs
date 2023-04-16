@@ -1,6 +1,6 @@
 use crate as pallet_template;
 use frame_support::traits::{ConstU16, ConstU64};
-use sp_core::H256;
+use sp_core::{H256, parameter_types};
 use sp_runtime::{
 	testing::Header,
 	traits::{BlakeTwo256, IdentityLookup},
@@ -48,8 +48,13 @@ impl frame_system::Config for Test {
 	type MaxConsumers = frame_support::traits::ConstU32<16>;
 }
 
+parameter_types! {
+	pub const TimeDuration: u32 = 2_16_000;
+}
+
 impl pallet_template::Config for Test {
 	type RuntimeEvent = RuntimeEvent;
+	type expire_time = TimeDuration;
 }
 
 // Build genesis storage according to the mock runtime.
