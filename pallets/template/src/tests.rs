@@ -16,6 +16,18 @@ fn add_manufacture_successfully() {
 }
 
 #[test]
+fn add_manufacture_fail() {
+	new_test_ext().execute_with(|| {
+		const TEST_ACCOUNT: <Test as frame_system::Config>::AccountId = 1;
+		// Dispatch a signed extrinsic.
+
+		assert_noop!(TemplateModule::add_manufacturer(RuntimeOrigin::signed(1),TEST_ACCOUNT),
+			sp_runtime::DispatchError::BadOrigin
+		);
+	})
+}
+
+#[test]
 fn add_duplicate_manufacture_fail() {
 	new_test_ext().execute_with(|| {
 		const TEST_ACCOUNT: <Test as frame_system::Config>::AccountId = 1;
