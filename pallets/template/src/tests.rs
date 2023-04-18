@@ -42,3 +42,35 @@ fn add_product_successfully() {
 
 	})
 }
+
+#[test]
+fn add_duplicate_product_fail() {
+	new_test_ext().execute_with(|| {
+		const TEST_ACCOUNT: <Test as frame_system::Config>::AccountId = 1;
+
+		assert_ok!(TemplateModule::add_manufacturer(RuntimeOrigin::root(), TEST_ACCOUNT));
+		let hash = HashType::from(Hashing::hash_of(&42));
+
+		assert_ok!(TemplateModule::add_product(RuntimeOrigin::signed(1), hash));
+
+		assert_noop!(TemplateModule::add_product(RuntimeOrigin::signed(1), hash),
+			Error::<Test>::ProductAlreadyPresent
+		);
+
+	})
+}
+
+#[test]
+fn add_product_by_unauthorised_person_fail() {
+	new_test_ext().execute_with(|| {
+		const TEST_ACCOUNT: <Test as frame_system::Config>::AccountId = 1;
+
+		assert_ok!(TemplateModule::add_manufacturer(RuntimeOrigin::root(), TEST_ACCOUNT));
+		let hash = HashType::from(Hashing::hash_of(&42));
+
+		assert_noop!(TemplateModule::add_product(RuntimeOrigin::signed(2), hash),
+			Error::<Test>::UnAuthorisedPerson
+		);
+
+	})
+}
