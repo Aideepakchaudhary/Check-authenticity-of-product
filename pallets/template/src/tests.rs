@@ -101,3 +101,35 @@ fn add_product_by_unauthorised_person_fail() {
 
 	})
 }
+
+#[test]
+fn check_authenticity_successfully() {
+	new_test_ext().execute_with(|| {
+		const TEST_ACCOUNT: <Test as frame_system::Config>::AccountId = 1;
+
+		assert_ok!(TemplateModule::add_manufacturer(RuntimeOrigin::root(), TEST_ACCOUNT));
+		let hash = HashType::from(Hashing::hash_of(&42));
+
+		assert_ok!(TemplateModule::add_product(RuntimeOrigin::signed(1), hash));
+
+		assert_ok!(TemplateModule::check_authenticity(RuntimeOrigin::signed(1), hash));
+
+	})
+}
+
+#[test]
+fn check_authenticity_fail() {
+	new_test_ext().execute_with(|| {
+		const TEST_ACCOUNT: <Test as frame_system::Config>::AccountId = 1;
+
+		assert_ok!(TemplateModule::add_manufacturer(RuntimeOrigin::root(), TEST_ACCOUNT));
+		let hash = HashType::from(Hashing::hash_of(&42));
+
+		assert_ok!(TemplateModule::add_product(RuntimeOrigin::signed(1), hash));
+
+		let check_hash = HashType::from(Hashing::hash_of(&43));
+		assert_noop!(TemplateModule::check_authenticity(RuntimeOrigin::signed(1), check_hash),
+			Error::<Test>::UnAuthenticProduct
+		);
+	})
+}
