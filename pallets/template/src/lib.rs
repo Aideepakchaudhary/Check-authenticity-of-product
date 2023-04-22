@@ -170,7 +170,7 @@ pub mod pallet {
 
 			let mut products = PartialSellProduct::<T>::get();
 			// check this product is sold or not?
-			let location = products.binary_search(&hash).err().ok_or(Error::<T>::UnsoldProduct)?;
+			let location = products.binary_search(&hash).ok().ok_or(Error::<T>::UnsoldProduct)?;
 
 			// Now remove the product from partial sale.
 			products.remove(location);
