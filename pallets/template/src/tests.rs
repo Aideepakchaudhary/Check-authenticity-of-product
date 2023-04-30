@@ -186,3 +186,21 @@ fn duplicate_refund_products_fail() {
 		);
 	})
 }
+
+#[test]
+fn refund_products_from_incorrect_origin_fail() {
+	new_test_ext().execute_with(|| {
+		const TEST_ACCOUNT: <Test as frame_system::Config>::AccountId = 1;
+
+		assert_ok!(TemplateModule::add_manufacturer(RuntimeOrigin::root(), TEST_ACCOUNT));
+		let hash = HashType::from(Hashing::hash_of(&42));
+
+		assert_ok!(TemplateModule::add_product(RuntimeOrigin::signed(1), hash));
+
+		assert_ok!(TemplateModule::check_authenticity(RuntimeOrigin::signed(1), hash));
+
+		assert_noop!(TemplateModule::refund_products(RuntimeOrigin::root(), hash),
+			sp_runtime::DispatchError::BadOrigin
+		);
+	})
+}
