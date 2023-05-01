@@ -5,8 +5,6 @@ Only manufacturing unit will allow to add all the hash of the product.
 
  Should have mechanism to add manufacturing unit
 
- Need to think..if a product is used then do we need to delete the product from the chain?
-
  Anybody can see the barcode on the product and try to copy that barcode and put on the fake product?
 
 ### Conditions
